@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+
+    <style>
+        .axis path {
+            fill: none;
+            stroke: #777;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-family: Lato;
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+            <svg id="visualisation" width="1000" height="500"></svg>
+            <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+            <script>
+                function Diet() {
+                    var fat = [{
+                        "grams": "173",
+                        "day": "1"
+                    }, {
+                        "grams": "184",
+                        "day": "2"
+                    }, {
+                        "grams": "190",
+                        "day": "3"
+                    }, {
+                        "grams": "120",
+                        "day": "4"
+                    }, {
+                        "grams": "132",
+                        "day": "5"
+                    }, {
+                        "grams": "141",
+                        "day": "6"
+                    }, {
+                        "grams": "138",
+                        "day": "7"
+                    }, {
+                        "grams": "190",
+                        "day": "8"
+                    }, {
+                        "grams": "187",
+                        "day": "9"
+                    }, {
+                        "grams": "175",
+                        "day": "10"
+                    }, {
+                        "grams": "150",
+                        "day": "11"
+                    }, {
+                        "grams": "145",
+                        "day": "12"
+                    }, {
+                        "grams": "152",
+                        "day": "13"
+                    }, {
+                        "grams": "162",
+                        "day": "14"
+                    }, {
+                        "grams": "176",
+                        "day": "15"
+                    }, {
+                        "grams": "164",
+                        "day": "16"
+                    }, {
+                        "grams": "158",
+                        "day": "17"
+                    }];
+                    var protein = [{
+                        "grams": "110",
+                        "day": "1"
+                    }, {
+                        "grams": "120",
+                        "day": "2"
+                    }, {
+                        "grams": "130",
+                        "day": "3"
+                    }, {
+                        "grams": "80",
+                        "day": "4"
+                    }, {
+                        "grams": "101",
+                        "day": "5"
+                    }, {
+                        "grams": "98",
+                        "day": "6"
+                    }, {
+                        "grams": "111",
+                        "day": "7"
+                    }, {
+                        "grams": "130",
+                        "day": "8"
+                    }, {
+                        "grams": "142",
+                        "day": "9"
+                    }, {
+                        "grams": "132",
+                        "day": "10"
+                    }, {
+                        "grams": "104",
+                        "day": "11"
+                    }, {
+                        "grams": "110",
+                        "day": "12"
+                    }, {
+                        "grams": "103",
+                        "day": "13"
+                    }, {
+                        "grams": "113",
+                        "day": "14"
+                    }, {
+                        "grams": "130",
+                        "day": "15"
+                    }, {
+                        "grams": "145",
+                        "day": "16"
+                    }, {
+                        "grams": "120",
+                        "day": "17"
+                    }];
+                    var carbs = [{
+                        "grams": "30",
+                        "day": "1"
+                    }, {
+                        "grams": "50",
+                        "day": "2"
+                    }, {
+                        "grams": "30",
+                        "day": "3"
+                    }, {
+                        "grams": "50",
+                        "day": "4"
+                    }, {
+                        "grams": "40",
+                        "day": "5"
+                    }, {
+                        "grams": "30",
+                        "day": "6"
+                    }, {
+                        "grams": "24",
+                        "day": "7"
+                    }, {
+                        "grams": "60",
+                        "day": "8"
+                    }, {
+                        "grams": "32",
+                        "day": "9"
+                    }, {
+                        "grams": "45",
+                        "day": "10"
+                    }, {
+                        "grams": "50",
+                        "day": "11"
+                    }, {
+                        "grams": "25",
+                        "day": "12"
+                    }, {
+                        "grams": "35",
+                        "day": "13"
+                    }, {
+                        "grams": "23",
+                        "day": "14"
+                    }, {
+                        "grams": "32",
+                        "day": "15"
+                    }, {
+                        "grams": "65",
+                        "day": "16"
+                    }, {
+                        "grams": "52",
+                        "day": "17"
+                    }];
+                    var vis = d3.select("#visualisation"),
+                        WIDTH = 1000,
+                        HEIGHT = 450,
+                        MARGINS = {
+                            top: 22,
+                            right: 200,
+                            bottom: 20,
+                            left: 125
+                        },
+                        xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([1, 17]),
+                        yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 250]),
+                        xAxis = d3.svg.axis()
+                        .scale(xScale),
+                        
+                        yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left")
+                        ;
+                    vis.append("svg:text")
+                        .attr("x", 450 )
+                        .attr("y", 20)
+                        .style("text-anchor", "middle")
+                        .text("Consumption of Nutrition in Grams");
+                    vis.append("svg:text")
+                        .attr("x", 860 )
+                        .attr("y", 350)
+                        .style("text-anchor", "middle")
+                        .text("Red: Carbs");
+                    vis.append("svg:text")
+                        .attr("x", 860 )
+                        .attr("y", 255)
+                        .style("text-anchor", "middle")
+                        .text("Blue: Proteins");
+                    vis.append("svg:text")
+                        .attr("x", 860 )
+                        .attr("y", 160)
+                        .style("text-anchor", "middle")
+                        .text("Green: Fats");
+                    vis.append("svg:g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                        .call(xAxis);
+                    vis.append("svg:text")      // text label for the x axis
+                        .attr("x", 450 )
+                        .attr("y", 480 )
+                        .style("text-anchor", "middle")
+                        .text("Day of Diet");
+                    vis.append("svg:g")
+                        .attr("class", "y axis")
+                        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                        .call(yAxis);
+                    vis.append("svg:text")      // text label for the y axis
+                        .attr("x", 50 )
+                        .attr("y", 50 )
+                        .style("text-anchor", "middle")
+                        .text("Grams");
+                    var lineGen = d3.svg.line()
+                        .x(function(d) {
+                            return xScale(d.day);
+                        })
+                        .y(function(d) {
+                            return yScale(d.grams);
+                        })
+                        .interpolate("basis");
+                    vis.append('svg:path')
+                        .attr('d', lineGen(fat))
+                        .attr('stroke', 'green')
+                        .attr('stroke-width', 2)
+                        .attr('fill', 'none');
+                    vis.append('svg:path')
+                        .attr('d', lineGen(protein))
+                        .attr('stroke', 'blue')
+                        .attr('stroke-width', 2)
+                        .attr('fill', 'none');
+                    vis.append('svg:path')
+                        .attr('d', lineGen(carbs))
+                        .attr('stroke', 'red')
+                        .attr('stroke-width', 2)
+                        .attr('fill', 'none');
+                }
+                Diet();
+            </script>
+                    </body>
+
+</html>
