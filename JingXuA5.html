@@ -1,0 +1,246 @@
+<head>
+
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+
+    <style>
+        body {
+          font: 10px sans-serif;
+          margin: 50px;
+        }
+
+        .grid .tick {
+            stroke: lightgrey;
+            opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+
+        .grid path {
+            stroke-width: 0;
+        }
+
+        .axis path {
+            fill: none;
+            stroke: #bbb;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            fill: #555;
+        }
+
+        .axis line {	
+            stroke: #e7e7e7;
+            shape-rendering: crispEdges;
+        }
+
+        .axis .axis-label {
+            font-size: 14px;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 1.5px;
+        }
+
+        .dot {
+            /* consider the stroke-with the mouse detect radius? */
+            stroke: transparent;
+            stroke-width: 10px;  
+            cursor: pointer;
+        }
+
+        .dot:hover {
+            stroke: rgba(68, 127, 255, 0.3);
+        }
+    </style>
+</head>
+
+    <div id="option">
+    <input name="updateButton" 
+    type="button" 
+    value="Update" 
+    onclick="updateData()" />
+    </div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<body>
+
+            <svg id="visualisation" width="1200" height="50"></svg>
+            <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+            <script>
+
+                /*Diet data, y = grams, x = day of diet*/
+                
+var data = 	[
+    [{'y':173,'x':1},{'y':184,'x':2},{'y':190,'x':3},{'y':120,'x':4},{'y':132,'x':5},{'y':141,'x':6},{'y':138,'x':7},{'y':190,'x':8},{'y':187,'x':9},{'y':175,'x':10},{'y':150,'x':11},{'y':145,'x':12},{'y':152,'x':13},{'y':162,'x':14},{'y':176,'x':15},{'y':164,'x':16},{'y':158,'x':17}],
+    [{'y':110,'x':1},{'y':120,'x':2},{'y':130,'x':3},{'y':80,'x':4},{'y':101,'x':5},{'y':98,'x':6},{'y':111,'x':7},{'y':130,'x':8},{'y':142,'x':9},{'y':132,'x':10},{'y':104,'x':11},{'y':110,'x':12},{'y':103,'x':13},{'y':113,'x':14},{'y':130,'x':15},{'y':145,'x':16},{'y':120,'x':17}],
+    [{'y':30,'x':1},{'y':50,'x':2},{'y':30,'x':3},{'y':50,'x':4},{'y':40,'x':5},{'y':30,'x':6},{'y':24,'x':7},{'y':60,'x':8},{'y':32,'x':9},{'y':45,'x':10},{'y':50,'x':11},{'y':25,'x':12},{'y':35,'x':13},{'y':23,'x':14},{'y':32,'x':15},{'y':65,'x':16},{'y':52,'x':17}]
+];
+ 
+var colors = [
+	'green',
+    'steelblue',
+	'red',
+]
+ 
+/*create margins, axises, and zoom behavior*/
+
+var margin = {top: 20, right: 90, bottom: 50, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+	
+var x = d3.scale.linear()
+    .domain([1, 17])
+    .range([0, width]);
+ 
+var y = d3.scale.linear()
+    .domain([-1, 240])
+    .range([height, 0]);
+	
+var xAxis = d3.svg.axis()
+    .scale(x)
+	.tickSize(-height)
+	.tickPadding(10)	
+	.tickSubdivide(true)	
+    .orient("bottom");	
+	
+var yAxis = d3.svg.axis()
+    .scale(y)
+	.tickPadding(10)
+	.tickSize(-width)
+	.tickSubdivide(true)	
+    .orient("left");
+	
+var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);	
+	
+/*create svg object*/
+                
+var svg = d3.select("body").append("svg")
+	.call(zoom)
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+	.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+ 
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+ 
+svg.append("g")
+	.attr("class", "y axis")
+	.append("text")
+	.attr("class", "axis-label")
+	.attr("transform", "rotate(-90)")
+	.attr("y", (-margin.left) + 10)
+	.attr("x", -height/2)
+	.text('Grams');	
+                
+svg.append("g")
+	.attr("class", "x axis")
+	.append("text")
+	.attr("class", "axis-label")
+	.attr("y", 470)
+	.attr("x", 380)
+	.text('Day of Diet');	
+ 
+svg.append("clipPath")
+	.attr("id", "clip")
+	.append("rect")
+	.attr("width", width)
+	.attr("height", height);
+
+svg.append("g")
+    .attr("class", "title")
+    .append("text")
+    .attr("x", 420)
+    .attr("y", -10)
+    .style("text-anchor", "middle")
+    .text("Consumption of Nutrition in Grams");
+svg.append("svg:text")
+    .attr("x", 860 )
+    .attr("y", 350)
+    .style("text-anchor", "middle")
+    .text("Red: Carbs");
+svg.append("svg:text")
+    .attr("x", 860 )
+    .attr("y", 255)
+    .style("text-anchor", "middle")
+    .text("Blue: Proteins");
+svg.append("svg:text")
+    .attr("x", 860 )
+    .attr("y", 160)
+    .style("text-anchor", "middle")
+    .text("Green: Fats");
+
+/*draw lines*/
+                
+var line = d3.svg.line()
+    .interpolate("linear")	
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.y); });		
+	
+svg.selectAll('.line')
+	.data(data)
+	.enter()
+	.append("path")
+    .attr("class", "line")
+	.attr("clip-path", "url(#clip)")
+	.attr('stroke', function(d,i){ 			
+		return colors[i%colors.length];
+	})
+    .attr("d", line);		
+	
+/*draw dots and color*/
+                
+var points = svg.selectAll('.dots')
+	.data(data)
+	.enter()
+	.append("g")
+    .attr("class", "dots")
+	.attr("clip-path", "url(#clip)");	
+ 
+points.selectAll('.dot')
+	.data(function(d, index){ 		
+		var a = [];
+		d.forEach(function(point,i){
+			a.push({'index': index, 'point': point});
+		});		
+		return a;
+	})
+	.enter()
+	.append('circle')
+	.attr('class','dot')
+	.attr("r", 2.5)
+	.attr('fill', function(d,i){ 	
+		return colors[d.index%colors.length];
+	})	
+	.attr("transform", function(d) { 
+		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+	);
+    
+/*zoom behavior*/
+                
+function zoomed() {
+	svg.select(".x.axis").call(xAxis);
+	svg.select(".y.axis").call(yAxis);   
+	svg.selectAll('path.line').attr('d', line);  
+ 
+	points.selectAll('circle').attr("transform", function(d) { 
+		return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+	);  
+}
+
+</script>
+</body>
